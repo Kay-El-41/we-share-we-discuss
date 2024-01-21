@@ -1,7 +1,15 @@
 import React from "react";
 
-const page = () => {
-  return <div>page</div>;
+type TopicShowPageType = {
+  params: {
+    slug?: string;
+    searchParams?: {};
+  };
 };
 
-export default page;
+const TopicShowPage = (params: TopicShowPageType) => {
+  console.log(params.params.slug);
+  return <div>{params.params.slug}</div>;
+};
+
+export default TopicShowPage;
