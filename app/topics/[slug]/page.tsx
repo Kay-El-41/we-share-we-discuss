@@ -1,3 +1,4 @@
+import PostCreateForm from "@/src/components/posts/post-create-form";
 import React from "react";
 
 type TopicShowPageType = {
@@ -8,8 +9,18 @@ type TopicShowPageType = {
 };
 
 const TopicShowPage = (params: TopicShowPageType) => {
-  console.log(params.params.slug);
-  return <div>{params.params.slug}</div>;
+  const slug = decodeURI(params.params.slug || "");
+
+  return (
+    <div className="grid grid-cols-4 gap-4 p-4">
+      <div className="col-span-3">
+        <h1 className="mb-2 text-2xl font-bold">{slug}</h1>
+      </div>
+      <div>
+        <PostCreateForm slug={slug} />
+      </div>
+    </div>
+  );
 };
 
 export default TopicShowPage;
