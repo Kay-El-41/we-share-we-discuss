@@ -1,5 +1,88 @@
 "use server";
 
-export async function createComment() {
-  // TODO: Revalidate the Show Post Page
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { auth } from "@/src/auth";
+import { database } from "@/src/database/database";
+import paths from "@/src/paths";
+
+const createCommentSchema = z.object({
+  content: z.string().min(3),
+});
+
+interface CreateCommentFormState {
+  errors: {
+    content?: string[];
+    _form?: string[];
+  };
+  success?: boolean;
+}
+
+export async function createComment(
+  { postId, parentId }: { postId: string; parentId?: string },
+  formState: CreateCommentFormState,
+  formData: FormData
+): Promise<CreateCommentFormState> {
+  const result = createCommentSchema.safeParse({
+    content: formData.get("content"),
+  });
+
+  if (!result.success) {
+    return {
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  const session = await auth();
+  if (!session || !session.user) {
+    return {
+      errors: {
+        _form: ["You must sign in to do this."],
+      },
+    };
+  }
+
+  try {
+    await database.comment.create({
+      data: {
+        content: result.data.content,
+        postId: postId,
+        parentId: parentId,
+        //@ts-ignore: next-auth-type-error, we fixed that problem in the auth.ts
+        userId: session.user.id,
+      },
+    });
+  } catch (err) {
+    if (err instanceof Error) {
+      return {
+        errors: {
+          _form: [err.message],
+        },
+      };
+    } else {
+      return {
+        errors: {
+          _form: ["Something went wrong..."],
+        },
+      };
+    }
+  }
+
+  const topic = await database.topic.findFirst({
+    where: { posts: { some: { id: postId } } },
+  });
+
+  if (!topic) {
+    return {
+      errors: {
+        _form: ["Failed to revalidate topic"],
+      },
+    };
+  }
+
+  revalidatePath(paths.postShow(topic.slug, postId));
+  return {
+    errors: {},
+    success: true,
+  };
 }
