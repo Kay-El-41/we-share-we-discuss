@@ -1,10 +1,22 @@
-interface PostShowProps {}
+import { database } from "@/src/database/database";
+import { Post } from "@prisma/client";
+import { notFound } from "next/navigation";
 
-export default function PostShow({}: PostShowProps) {
+interface PostShowProps {
+  postId: string;
+}
+
+export default async function PostShow({ postId }: PostShowProps) {
+  const post = await database.post.findFirst({ where: { id: postId } });
+
+  if (!post) {
+    notFound();
+  }
+
   return (
     <div className="m-4">
-      <h1 className="text-2xl font-bold my-2">{post.title}</h1>
-      <p className="p-4 border rounded">{post.content}</p>
+      <h1 className="my-2 text-2xl font-bold">{post.title}</h1>
+      <p className="rounded border p-4">{post.content}</p>
     </div>
   );
 }
