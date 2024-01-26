@@ -1,9 +1,9 @@
 import Link from "next/link";
 import paths from "@/src/paths";
-import { PostWithData } from "@/src/database/queries/posts";
+import { EnrichedPostDetailForList } from "@/src/database/queries/posts";
 
 type PostListProps = {
-  fetchData: () => Promise<PostWithData[]>;
+  fetchData: () => Promise<EnrichedPostDetailForList[]>;
 };
 
 export default async function PostList({ fetchData }: PostListProps) {
