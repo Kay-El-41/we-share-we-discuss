@@ -1,10 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { auth } from "@/src/auth";
-import { database } from "@/src/database/database";
 import paths from "@/src/paths";
+import { auth } from "@/src/auth";
+import { revalidatePath } from "next/cache";
+import { database } from "@/src/database/database";
 
 const createCommentSchema = z.object({
   content: z.string().min(3),
