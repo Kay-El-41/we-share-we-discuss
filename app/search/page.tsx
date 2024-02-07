@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
+import PostList from "@/src/components/posts/post-list";
+import { fetchPostsBySearch } from "@/src/database/queries/posts";
 
 type SearchPageProps = {
   searchParams: {
-    term: String;
+    term: string;
   };
 };
 
@@ -13,7 +15,11 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
     redirect("/");
   }
 
-  return <div>{term}</div>;
+  return (
+    <div>
+      <PostList fetchData={() => fetchPostsBySearch(term)} />
+    </div>
+  );
 };
 
 export default SearchPage;
